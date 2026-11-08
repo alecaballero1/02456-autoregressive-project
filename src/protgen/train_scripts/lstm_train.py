@@ -12,6 +12,8 @@ from ..constants.lstm_constants import VOCAB_SIZE, N_IN, N_HID, NUM_EPOCHS
 import matplotlib.pyplot as plt
 import numpy as np
 from protgen.data import AA, FAMILIES, IGNORE_INDEX, special_tokens
+import time
+from datetime import datetime
 
 # Asserting identical vocab size across datasets
 assert train_data.vocab_size == val_data.vocab_size == test_data.vocab_size
@@ -34,6 +36,7 @@ training_loss, validation_loss = [], []
 
 # For each epoch
 for i in range(NUM_EPOCHS):
+    epoch_start = time.time()
     
     # Track loss
     epoch_training_loss = 0
@@ -104,7 +107,8 @@ for i in range(NUM_EPOCHS):
 
     # Print loss every 10 epochs
     if i % 10 == 0:
-        print(f'Epoch {i}, training loss: {training_loss[-1]}, validation loss: {validation_loss[-1]}')
+        epoch_duration = time.time() - epoch_start
+        print(f'Epoch {i}, training loss: {training_loss[-1]}, validation loss: {validation_loss[-1]}, duration: {epoch_duration:.2f}s', flush=True)
 
         
 # Get first sentence in test set

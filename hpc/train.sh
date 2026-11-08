@@ -3,7 +3,7 @@
 #BSUB -J train
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 0:30
+#BSUB -W 20:30
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -o hpc/logs/train.out
 #BSUB -e hpc/logs/train.err
