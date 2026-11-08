@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #BSUB -q gpuv100
 #BSUB -J train
 #BSUB -n 4
@@ -16,8 +16,10 @@
 #BSUB -N
 
 set -eu
-cd "$(dirname "$0")/.."
-source hpc/env.sh   # uv on the PATH, caches off the home quota
+
+#cd "$(dirname "$0")/.."
+source "hpc/env.sh"   # uv on the PATH, caches off the home quota
+export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
 
 # Your training command, e.g.:
-uv run python src\protgen\train_scripts\lstm_train.py
+uv run python -m protgen.train_scripts.lstm_train

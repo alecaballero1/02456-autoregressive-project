@@ -16,8 +16,11 @@ from protgen.data import AA, FAMILIES, IGNORE_INDEX, special_tokens
 # Asserting identical vocab size across datasets
 assert train_data.vocab_size == val_data.vocab_size == test_data.vocab_size
 
+# Ensure script is run on GPU rather than CPU
+device = torch.device("cuda")
+
 # Initialize a new network
-net = LSTMRNN(train_data.vocab_size, N_HID, 1, True,train_data.vocab_size)
+net = LSTMRNN(train_data.vocab_size, N_HID, 1, True,train_data.vocab_size).to(device)
 
 # Define a loss function and optimizer for this problem
 criterion = nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX) # using `ignore_index` to make the padding free of loss as recommended in the introduction.ipynb notebook
@@ -46,11 +49,10 @@ for i in range(NUM_EPOCHS):
             inputs_one_hot = one_hot_encode_sequence(inputs, val_data.vocab_size)
             
             # Convert input to tensor
-            inputs_one_hot = torch.Tensor(inputs_one_hot)
-            inputs_one_hot = inputs_one_hot.permute(2,0,1)
+            inputs_one_hot = torch.Tensor(inputs_one_hot, device=device).permute(2,0,1)
             
             # Convert target to tensor
-            targets_ = torch.LongTensor(targets)
+            targets_ = torch.LongTensor(targets, device=device)
             
             # Forward pass
             outputs = net(inputs_one_hot)
@@ -70,11 +72,10 @@ for i in range(NUM_EPOCHS):
         inputs_one_hot = one_hot_encode_sequence(inputs, train_data.vocab_size)
         
         # Convert input to tensor
-        inputs_one_hot = torch.Tensor(inputs_one_hot)
-        inputs_one_hot = inputs_one_hot.permute(2,0,1)
+        inputs_one_hot = torch.Tensor(inputs_one_hot, device=device).permute(2,0,1)
         
         # Convert target to tensor
-        targets_ = torch.LongTensor(targets)
+        targets_ = torch.LongTensor(targets, device=device)
         
         # Forward pass
         outputs = net(inputs_one_hot)
@@ -93,10 +94,13 @@ for i in range(NUM_EPOCHS):
         
         # Update loss
         epoch_training_loss += loss.item()
-        
+
     # Save loss for plot
     training_loss.append(epoch_training_loss/len(train_data))
     validation_loss.append(epoch_validation_loss/len(val_data))
+
+    # Save model
+    torch.save({"model": net.state_dict(), "criterion": criterion.state_dict(), "optimizer": optimizer.state_dict(), "train_loss": training_loss, "val_loss": validation_loss, "vocabulary": train_data.vocab, "vocabulary_size": train_data.vocab_size, "hidden_size": N_HID}, "lstm_train_model.pth")    
 
     # Print loss every 10 epochs
     if i % 10 == 0:
@@ -110,8 +114,7 @@ inputs, targets, labels, lengths = test_data[0]
 inputs_one_hot = one_hot_encode_sequence(inputs, test_data.vocab_size)
 
 # Convert input to tensor
-inputs_one_hot = torch.Tensor(inputs_one_hot)
-inputs_one_hot = inputs_one_hot.permute(2,0,1)
+inputs_one_hot = torch.Tensor(inputs_one_hot, device=device).permute(2,0,1)
 
 # Convert target to tensor (not used currently, uncomment if used in the future)
 # targets_ = torch.LongTensor(targets)
@@ -119,7 +122,7 @@ inputs_one_hot = inputs_one_hot.permute(2,0,1)
 # Forward pass
 net.eval()
 with torch.no_grad():
-    outputs = net(inputs_one_hot).numpy()
+    outputs = net(inputs_one_hot).cpu().numpy()
 
 print('\nInput sequence:')
 print(inputs)
