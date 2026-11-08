@@ -37,4 +37,4 @@ def one_hot_encode_sequence(sequence, vocab_size):
 
     # Reshape encoding s.t. it has shape (num words, vocab size, 1)
     encoding = encoding.reshape(encoding.shape[0], encoding.shape[2], 1)
-    return torch.Tensor(encoding)
+    return torch.tensor(encoding)
