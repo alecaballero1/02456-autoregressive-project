@@ -11,13 +11,13 @@
 # Submit your training run to a GPU queue:   bsub < hpc/train.sh
 #
 # Uncomment the #BSUB -u/-B/-N lines to be emailed when the job starts and ends.
-##BSUB -u <EMAIL_ADDRESS>
-##BSUB -B
-##BSUB -N
+#BSUB -u s214946@dtu.dk
+#BSUB -B
+#BSUB -N
 
 set -eu
 cd "$(dirname "$0")/.."
 source hpc/env.sh   # uv on the PATH, caches off the home quota
 
 # Your training command, e.g.:
-# uv run python train.py
+uv run python src\protgen\train_scripts\lstm_train.py
