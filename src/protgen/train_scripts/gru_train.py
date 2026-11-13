@@ -1,15 +1,15 @@
+import argparse
 import csv
 
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from datetime import datetime
 
 from protgen.helpers.gru_constants import (
     CHECKPOINT_DIR,
     EPOCHS,
     BATCH_SIZE,
-    GRU_HIDDEN_SIZE,
+    GRU_SIZE,
     LEARNING_RATE,
     NUM_GRU_LAYERS,
     GRADIENT_CLIP_NORM,
@@ -22,14 +22,20 @@ from protgen.helpers.gru_epochs import train_epoch, evaluate
 
 
 class TrainGru:
-    def __init__(self):
+    def __init__(self, **args):
         self.seed = SEED
+        self.epochs = args.get("epochs", EPOCHS)
+        self.num_gru_layers = args.get("num_gru_layers", NUM_GRU_LAYERS)
+        self.gru_size = args.get("gru_size", GRU_SIZE)
+        self.learning_rate = args.get("learning_rate", LEARNING_RATE)
+        self.batch_size = args.get("batch_size", BATCH_SIZE)
+        self.weight_decay = args.get("weight_decay", WEIGHT_DECAY)
 
-        self.time_stamp = datetime.now().strftime("%y%m%d%H%M")
-        rate_label = f"{LEARNING_RATE:.10f}".removeprefix("0.").rstrip("0")
+        rate_label = f"{self.learning_rate:.10f}".removeprefix("0.").rstrip("0")
         self.run_name = (
-            f"gru_h{GRU_HIDDEN_SIZE}_l{NUM_GRU_LAYERS}_"
-            f"r{rate_label}_e{EPOCHS}_{self.time_stamp}"
+            f"gru_h{self.gru_size}_l{self.num_gru_layers}_"
+            f"r{rate_label}_e{self.epochs}_"
+            f"b{self.batch_size}_d{self.weight_decay}"
         )
         self.checkpoint_path = CHECKPOINT_DIR / f"{self.run_name}.pt"
         self.history_path = CHECKPOINT_DIR / f"{self.run_name}_history.csv"
@@ -47,26 +53,26 @@ class TrainGru:
 
         train_loader = DataLoader(
             train_data,
-            batch_size=BATCH_SIZE,
+            batch_size=self.batch_size,
             shuffle=True,
         )
 
         val_loader = DataLoader(
             val_data,
-            batch_size=BATCH_SIZE,
+            batch_size=self.batch_size,
             shuffle=False,
         )
 
         model = Gru(
             vocab_size=train_data.vocab_size,
-            hidden_size=GRU_HIDDEN_SIZE,
-            num_layers=NUM_GRU_LAYERS,
+            hidden_size=self.gru_size,
+            num_layers=self.num_gru_layers,
         ).to(device)
 
         optimizer = optim.RMSprop(
             model.parameters(),
-            lr=LEARNING_RATE,
-            weight_decay=WEIGHT_DECAY,
+            lr=self.learning_rate,
+            weight_decay=self.weight_decay,
         )
 
         loss_function = nn.CrossEntropyLoss(
@@ -86,7 +92,7 @@ class TrainGru:
             writer = csv.writer(handle)
             writer.writerow(["epoch", "train_loss", "val_loss"])
 
-            for epoch in range(1, EPOCHS + 1):
+            for epoch in range(1, self.epochs + 1):
                 train_loss = train_epoch(
                     model,
                     train_loader,
@@ -122,11 +128,11 @@ class TrainGru:
                         "dropout": model.rnn_layer.dropout,
                         "gradient_clip_norm": GRADIENT_CLIP_NORM,
                         "best_epoch": epoch,
-                        "total_epochs": EPOCHS,
+                        "total_epochs": self.epochs,
                         "val_loss": val_loss,
-                        "learning_rate": LEARNING_RATE,
-                        "weight_decay": WEIGHT_DECAY,
-                        "batch_size": BATCH_SIZE,
+                        "learning_rate": self.learning_rate,
+                        "weight_decay": self.weight_decay,
+                        "batch_size": self.batch_size,
                         "optimizer": "RMSprop",
                         "seed": self.seed,
                     }, self.checkpoint_path)
@@ -148,4 +154,13 @@ class TrainGru:
 
 
 if __name__ == "__main__":
-    model = TrainGru().train()
+    parser = argparse.ArgumentParser(description="Train a GRU protein sequence model.")
+    parser.add_argument("--epochs", type=int, default=argparse.SUPPRESS)
+    parser.add_argument("--num-gru-layers", type=int, default=argparse.SUPPRESS)
+    parser.add_argument("--gru-size", type=int, default=argparse.SUPPRESS)
+    parser.add_argument("--learning-rate", type=float, default=argparse.SUPPRESS)
+    parser.add_argument("--batch-size", type=int, default=argparse.SUPPRESS)
+    parser.add_argument("--weight-decay", type=float, default=argparse.SUPPRESS)
+    args = parser.parse_args()
+
+    model = TrainGru(**vars(args)).train()

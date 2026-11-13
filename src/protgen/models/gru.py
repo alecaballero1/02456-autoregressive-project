@@ -7,10 +7,10 @@ Other sources:
 from torch import nn
 import torch.nn.functional as nn_func
 
-from protgen.helpers.gru_constants import NUM_GRU_LAYERS, GRU_HIDDEN_SIZE, GRU_DROPOUT
+from protgen.helpers.gru_constants import NUM_GRU_LAYERS, GRU_SIZE, GRU_DROPOUT
 
 class Gru(nn.Module):
-    def __init__(self, vocab_size, hidden_size=GRU_HIDDEN_SIZE, num_layers=NUM_GRU_LAYERS):
+    def __init__(self, vocab_size, hidden_size=GRU_SIZE, num_layers=NUM_GRU_LAYERS):
         super().__init__()
 
         self.vocab_size = vocab_size        

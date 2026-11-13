@@ -10,7 +10,7 @@ SEED = 1
 
 # Model
 NUM_GRU_LAYERS = 1 #l
-GRU_HIDDEN_SIZE = 50 #h
+GRU_SIZE = 50 #h
 GRU_DROPOUT = 0.0 #Dr
 
 # Training
