@@ -8,12 +8,13 @@ from torch import nn
 from ..data.split_data import train_data, val_data, test_data
 from ..helpers.one_hot_encoding import one_hot_encode_sequence
 import torch
-from ..constants.lstm_constants import VOCAB_SIZE, N_IN, N_HID, NUM_EPOCHS
+from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME
 import matplotlib.pyplot as plt
 import numpy as np
-from protgen.data import AA, FAMILIES, IGNORE_INDEX, special_tokens
+from protgen.data import IGNORE_INDEX
 import time
-from datetime import datetime
+import csv
+from pathlib import Path
 
 # Asserting identical vocab size across datasets
 assert train_data.vocab_size == val_data.vocab_size == test_data.vocab_size
@@ -103,7 +104,9 @@ for i in range(NUM_EPOCHS):
     validation_loss.append(epoch_validation_loss/len(val_data))
 
     # Save model
-    torch.save({"model": net.state_dict(), "criterion": criterion.state_dict(), "optimizer": optimizer.state_dict(), "train_loss": training_loss, "val_loss": validation_loss, "vocabulary": train_data.vocab, "vocabulary_size": train_data.vocab_size, "hidden_size": N_HID}, "lstm_train_model.pth")    
+    src_path = Path(__file__).resolve().parents[2]
+    model_path = src_path / "protgen" / "generated" / "lstm" / MODEL_NAME
+    torch.save({"model": net.state_dict(), "criterion": criterion.state_dict(), "optimizer": optimizer.state_dict(), "train_loss": training_loss, "val_loss": validation_loss, "vocabulary": train_data.vocab, "vocabulary_size": train_data.vocab_size, "hidden_size": N_HID}, model_path)    
 
     # Print loss every 10 epochs
     if i % 10 == 0:
