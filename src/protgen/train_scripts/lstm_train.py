@@ -8,7 +8,7 @@ from torch import nn
 from ..data.split_data import train_data, val_data, test_data
 from ..helpers.one_hot_encoding import one_hot_encode_sequence
 import torch
-from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME
+from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME, MODEL_NB
 import matplotlib.pyplot as plt
 import numpy as np
 from protgen.data import IGNORE_INDEX
@@ -105,7 +105,9 @@ for i in range(NUM_EPOCHS):
 
     # Save model
     src_path = Path(__file__).resolve().parents[2]
-    model_path = src_path / "protgen" / "generated" / "lstm" / MODEL_NAME
+    model_path = src_path / "protgen" / "generated" / "lstm" / str(MODEL_NB)
+    model_path.mkdir(parents=True, exist_ok=True)
+    model_path = model_path / MODEL_NAME
     torch.save({"model": net.state_dict(), "criterion": criterion.state_dict(), "optimizer": optimizer.state_dict(), "train_loss": training_loss, "val_loss": validation_loss, "vocabulary": train_data.vocab, "vocabulary_size": train_data.vocab_size, "hidden_size": N_HID}, model_path)    
 
     # Print loss every 10 epochs

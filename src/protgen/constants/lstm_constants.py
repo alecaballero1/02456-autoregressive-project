@@ -9,5 +9,5 @@ BOS_IDX = 1
 PAD_IDX = 0
 EOS_IDX = 2
 CSV_FILENAME = "lstm_samples.csv"
-MODEL_NB = 1
+MODEL_NB = 2
 MODEL_NAME = "lstm_train_model.pth"
