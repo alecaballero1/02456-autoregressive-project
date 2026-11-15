@@ -38,7 +38,7 @@ for NAME in $SETS; do
         continue
     fi
     echo "== $NAME"
-    bash hpc/run_eval.sh "$SAMPLES" "results/eval/2
+    bash hpc/run_eval.sh "$SAMPLES" "results/eval/2"
 done
 
 echo "Done."
