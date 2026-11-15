@@ -5,8 +5,8 @@
 #BSUB -gpu "num=1:mode=exclusive_process"
 #BSUB -W 2:00
 #BSUB -R "rusage[mem=8GB]"
-#BSUB -o hpc/logs/eval.out
-#BSUB -e hpc/logs/eval.err
+#BSUB -o hpc/logs/eval_%J.out
+#BSUB -e hpc/logs/eval_%J.err
 
 # Score sample sets on a GPU, structures included:   bsub < hpc/eval.sh
 #
@@ -16,17 +16,18 @@
 # sampled. Each set lands in results/eval/<name>/.
 #
 # Uncomment the #BSUB -u/-B/-N lines to be emailed when the job starts and ends.
-##BSUB -u <EMAIL_ADDRESS>
-##BSUB -B
-##BSUB -N
+#BSUB -u s214946@dtu.dk
+#BSUB -B
+#BSUB -N
 
 set -eu
 cd "$(dirname "$0")/.."
 
-SETS="control_real control_shuffled mock_data"
+# SETS="control_real control_shuffled mock_data"
+SETS="2"
 
 for NAME in $SETS; do
-    SAMPLES="results/sequences/$NAME.csv"
+    SAMPLES="results/sequences/$NAME/lstm_samples.csv"
     if [ ! -f "$SAMPLES" ]; then
         echo "== $NAME: no $SAMPLES, skipping"
         continue
@@ -35,4 +36,4 @@ for NAME in $SETS; do
     bash hpc/run_eval.sh "$SAMPLES"
 done
 
-echo "Done. Each set is in results/eval/<name>/"
+echo "Done."
