@@ -8,7 +8,7 @@ from torch import nn
 from ..data.split_data import train_data, val_data, test_data
 from ..helpers.one_hot_encoding import one_hot_encode_sequence
 import torch
-from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME, MODEL_NB, NUM_LAYERS
+from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME, MODEL_NB, NUM_LAYERS, MAX_EPOCHS_WITHOUT_IMPROVEMENT, MIN_IMPROVEMENT
 import matplotlib.pyplot as plt
 import numpy as np
 from protgen.data import IGNORE_INDEX
@@ -22,6 +22,10 @@ assert train_data.vocab_size == val_data.vocab_size == test_data.vocab_size
 # Ensure script is run on GPU rather than CPU
 device = torch.device("cuda")
 
+# parameters for early stopping
+best_validation_loss = float("inf")
+epochs_without_improvement = 0
+
 # Initialize a new network
 net = LSTMRNN(train_data.vocab_size, N_HID, NUM_LAYERS, True,train_data.vocab_size).to(device)
 
@@ -31,6 +35,12 @@ optimizer = optim.Adam(net.parameters(), lr=5e-4, weight_decay=1e-4) # learning 
 
 word_to_idx = train_data.vocab
 idx_to_word = {idx: token for token, idx in word_to_idx.items()}
+
+# Logic for saving best model
+src_path = Path(__file__).resolve().parents[2]
+model_path = src_path / "protgen" / "generated" / "lstm" / str(MODEL_NB)
+model_path.mkdir(parents=True, exist_ok=True)
+model_path = model_path / MODEL_NAME
 
 # Track loss
 training_loss, validation_loss = [], []
@@ -100,53 +110,27 @@ for i in range(NUM_EPOCHS):
         epoch_training_loss += loss.item()
 
     # Save loss for plot
-    training_loss.append(epoch_training_loss/len(train_data))
-    validation_loss.append(epoch_validation_loss/len(val_data))
+    average_train_loss = epoch_training_loss/len(train_data)
+    average_val_loss = epoch_validation_loss/len(val_data)
+    training_loss.append(average_train_loss)
+    validation_loss.append(average_val_loss)
 
-    # Save model
-    src_path = Path(__file__).resolve().parents[2]
-    model_path = src_path / "protgen" / "generated" / "lstm" / str(MODEL_NB)
-    model_path.mkdir(parents=True, exist_ok=True)
-    model_path = model_path / MODEL_NAME
-    torch.save({"model": net.state_dict(), "criterion": criterion.state_dict(), "optimizer": optimizer.state_dict(), "train_loss": training_loss, "val_loss": validation_loss, "vocabulary": train_data.vocab, "vocabulary_size": train_data.vocab_size, "hidden_size": N_HID}, model_path)    
-
+    # Check improvement
+    if average_val_loss < best_validation_loss - MIN_IMPROVEMENT:
+        best_validation_loss = average_val_loss
+        epochs_without_improvement = 0
+        # Save model
+        torch.save({"model": net.state_dict(), "criterion": criterion.state_dict(), "optimizer": optimizer.state_dict(), "train_loss": training_loss, "val_loss": validation_loss, "vocabulary": train_data.vocab, "vocabulary_size": train_data.vocab_size, "hidden_size": N_HID, "num_layers":NUM_LAYERS, "epoch": i+1, "best_validation_loss": best_validation_loss}, model_path)    
+        print(f"Epoch {i}, validation loss improved: {best_validation_loss:.4f}. New model has been saved.", flush=True)
+    else:
+        epochs_without_improvement += 1
     # Print loss every 10 epochs
     if i % 10 == 0:
         epoch_duration = time.time() - epoch_start
         print(f'Epoch {i}, training loss: {training_loss[-1]}, validation loss: {validation_loss[-1]}, duration: {epoch_duration:.2f}s', flush=True)
 
-        
-# Get first sentence in test set
-inputs, targets, labels, lengths = test_data[0]
-
-# One-hot encode input and target sequence
-inputs_one_hot = one_hot_encode_sequence(inputs, test_data.vocab_size)
-
-# Convert input to tensor
-inputs_one_hot = inputs_one_hot.to(dtype=torch.float32, device=device).permute(2,0,1)
-
-# Convert target to tensor (not used currently, uncomment if used in the future)
-# targets_ = torch.tensor(targets, dtype=tensor.long, device=device)
-
-# Forward pass
-net.eval()
-with torch.no_grad():
-    outputs = net(inputs_one_hot).cpu().numpy()
-
-print('\nInput sequence:')
-print(inputs)
-
-print('\nTarget sequence:')
-print(targets)
-
-print('\nPredicted sequence:')
-print([idx_to_word[np.argmax(output)] for output in outputs])
-
-# Plot training and validation loss
-epoch = np.arange(len(training_loss))
-plt.figure()
-plt.plot(epoch, training_loss, 'r', label='Training loss',)
-plt.plot(epoch, validation_loss, 'b', label='Validation loss')
-plt.legend()
-plt.xlabel('Epoch'), plt.ylabel('NLL')
-plt.show()
+    # Early stopping
+    if epochs_without_improvement >= MAX_EPOCHS_WITHOUT_IMPROVEMENT:
+        print(f"Early stopping at epoch {i+1}. The best validation loss was {best_validation_loss:.4f}", flush=True)
+        break
+            
