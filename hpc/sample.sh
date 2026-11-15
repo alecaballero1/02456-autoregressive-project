@@ -17,6 +17,10 @@
 
 set -eu
 
+export OMP_NUM_THREADS=4
+export MKL_NUM_THREADS=4
+export OPENBLAS_NUM_THREADS=4
+
 #cd "$(dirname "$0")/.."
 source "hpc/env.sh"   # uv on the PATH, caches off the home quota
 export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"
