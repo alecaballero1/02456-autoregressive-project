@@ -1,0 +1,17 @@
+net = LSTMRNN(train_data.vocab_size, N_HID, 1, True,train_data.vocab_size).to(device)
+
+VOCAB_SIZE = 1000
+N_IN = 50
+N_HID = 50
+NUM_EPOCHS = 200
+BOS = "<BOS>"
+PAD = "<PAD>"
+EOS = "<EOS>"
+BOS_IDX = 1
+PAD_IDX = 0
+EOS_IDX = 2
+CSV_FILENAME = "lstm_samples.csv"
+MODEL_NB = 2
+MODEL_NAME = "lstm_train_model.pth"
+
+no early stopping or other mitigation techniques

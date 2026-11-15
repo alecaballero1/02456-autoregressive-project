@@ -8,7 +8,7 @@ from torch import nn
 from ..data.split_data import train_data, val_data, test_data
 from ..helpers.one_hot_encoding import one_hot_encode_sequence
 import torch
-from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME, MODEL_NB
+from ..constants.lstm_constants import N_HID, NUM_EPOCHS, CSV_FILENAME, MODEL_NAME, MODEL_NB, NUM_LAYERS
 import matplotlib.pyplot as plt
 import numpy as np
 from protgen.data import IGNORE_INDEX
@@ -23,11 +23,11 @@ assert train_data.vocab_size == val_data.vocab_size == test_data.vocab_size
 device = torch.device("cuda")
 
 # Initialize a new network
-net = LSTMRNN(train_data.vocab_size, N_HID, 1, True,train_data.vocab_size).to(device)
+net = LSTMRNN(train_data.vocab_size, N_HID, NUM_LAYERS, True,train_data.vocab_size).to(device)
 
 # Define a loss function and optimizer for this problem
 criterion = nn.CrossEntropyLoss(ignore_index=IGNORE_INDEX) # using `ignore_index` to make the padding free of loss as recommended in the introduction.ipynb notebook
-optimizer = optim.Adam(net.parameters(), lr=1e-3)
+optimizer = optim.Adam(net.parameters(), lr=5e-4, weight_decay=1e-4) # learning rate 0.0005, weight decay (L2 regularization) 0.0001 to penalize model and reduce overfitting
 
 word_to_idx = train_data.vocab
 idx_to_word = {idx: token for token, idx in word_to_idx.items()}

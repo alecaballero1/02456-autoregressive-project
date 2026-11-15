@@ -14,9 +14,9 @@ class LSTMRNN(nn.Module):
 
         # Initializing vocab size
         self.vocab_size = vocab_size
-        
+        self.dropout = nn.Dropout(p=0.2)
         # Recurrent layer
-        self.lstm = nn.LSTM(input_size=n_in, hidden_size=n_hid, num_layers=nb_layers, bias=bias, batch_first=True)
+        self.lstm = nn.LSTM(input_size=n_in, hidden_size=n_hid, num_layers=nb_layers, bias=bias, batch_first=True, dropout=0.2) # dropout only works when NUM_LAYERS > 1
         
         # Output layer
         self.l_out = nn.Linear(in_features=n_hid,
@@ -29,7 +29,7 @@ class LSTMRNN(nn.Module):
         
         # Flatten output for feed-forward layer
         x = x.reshape(-1, self.lstm.hidden_size)
-        
+        x = self.dropout(x)
         # Output layer
         x = self.l_out(x)
         
