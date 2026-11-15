@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from ..constants.lstm_constants import VOCAB_SIZE, BOS_IDX, PAD_IDX, EOS_IDX
 import math
-from tqdm import tqdm
 from ..helpers.one_hot_encoding import one_hot_encode_sequence
 
 class LSTMRNN(nn.Module):
@@ -52,7 +51,8 @@ class LSTMRNN(nn.Module):
         # the course sample () method uses torch.empty(), but we have replaced this with torch.full(), since the model expects an input sequence
         token_ids = torch.full((batch_size, 1),BOS_IDX,device=device,dtype=torch.long)
 
-        for t in tqdm(range(num_steps), desc=f"Sampling {num_steps} steps.."):
+        for t in range(num_steps):
+            print(f"Sampling step nb {t+1}")
             # the course RNNLM model uses an embedding layer, but since our LSTMRNN expects one-hot encoded inputs, the sample() method has
             # been modified accordingly
             inputs_one_hot = torch.stack([one_hot_encode_sequence(sequence, self.vocab_size).squeeze(-1) for sequence in token_ids])

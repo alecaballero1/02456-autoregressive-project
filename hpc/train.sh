@@ -5,8 +5,8 @@
 #BSUB -gpu "num=1:mode=exclusive_process"
 #BSUB -W 20:30
 #BSUB -R "rusage[mem=8GB]"
-#BSUB -o hpc/logs/train.out
-#BSUB -e hpc/logs/train.err
+#BSUB -o hpc/logs/train_$J.out
+#BSUB -e hpc/logs/train_$J.err
 
 # Submit your training run to a GPU queue:   bsub < hpc/train.sh
 #

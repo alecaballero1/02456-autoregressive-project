@@ -53,7 +53,7 @@ for i in range(NUM_EPOCHS):
             inputs_one_hot = one_hot_encode_sequence(inputs, val_data.vocab_size)
             
             # Convert input to tensor
-            inputs_one_hot = torch.as_tensor(inputs_one_hot, dtype=torch.float32, device=device).permute(2,0,1)
+            inputs_one_hot = inputs_one_hot.to(dtype=torch.float32, device=device).permute(2,0,1)
             
             # Convert target to tensor
             targets_ = torch.as_tensor(targets, dtype=torch.long, device=device)
@@ -76,7 +76,7 @@ for i in range(NUM_EPOCHS):
         inputs_one_hot = one_hot_encode_sequence(inputs, train_data.vocab_size)
         
         # Convert input to tensor
-        inputs_one_hot = torch.as_tensor(inputs_one_hot, dtype=torch.float32, device=device).permute(2,0,1)
+        inputs_one_hot = inputs_one_hot.to(dtype=torch.float32, device=device).permute(2,0,1)
         
         # Convert target to tensor
         targets_ = torch.as_tensor(targets, dtype=torch.long, device=device)
@@ -121,7 +121,7 @@ inputs, targets, labels, lengths = test_data[0]
 inputs_one_hot = one_hot_encode_sequence(inputs, test_data.vocab_size)
 
 # Convert input to tensor
-inputs_one_hot = torch.as_tensor(inputs_one_hot, dtype=torch.float32, device=device).permute(2,0,1)
+inputs_one_hot = inputs_one_hot.to(dtype=torch.float32, device=device).permute(2,0,1)
 
 # Convert target to tensor (not used currently, uncomment if used in the future)
 # targets_ = torch.tensor(targets, dtype=tensor.long, device=device)
