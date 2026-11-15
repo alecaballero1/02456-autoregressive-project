@@ -4,7 +4,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from ..constants.lstm_constants import VOCAB_SIZE, BOS_IDX, PAD_IDX, EOS_IDX
+from ..constants.lstm_constants import BOS_IDX, PAD_IDX, EOS_IDX
 import math
 from ..helpers.one_hot_encoding import one_hot_encode_sequence
 
@@ -28,7 +28,7 @@ class LSTMRNN(nn.Module):
         x, (h, c) = self.lstm(x)
         
         # Flatten output for feed-forward layer
-        x = x.view(-1, self.lstm.hidden_size)
+        x = x.reshape(-1, self.lstm.hidden_size)
         
         # Output layer
         x = self.l_out(x)

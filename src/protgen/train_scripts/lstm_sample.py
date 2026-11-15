@@ -3,7 +3,7 @@ import csv
 from pathlib import Path
 from ..models.lstm_pytorch import LSTMRNN
 from ..data.split_data import train_data
-from ..constants.lstm_constants import BOS_IDX, PAD_IDX, EOS_IDX, CSV_FILENAME, MODEL_NAME, MODEL_NB
+from ..constants.lstm_constants import CSV_FILENAME, MODEL_NAME, MODEL_NB
 
 # Ensure script is run on GPU rather than CPU
 device = torch.device("cuda")
