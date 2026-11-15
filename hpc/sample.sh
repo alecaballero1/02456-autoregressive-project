@@ -5,8 +5,8 @@
 #BSUB -gpu "num=1:mode=exclusive_process"
 #BSUB -W 20:30
 #BSUB -R "rusage[mem=8GB]"
-#BSUB -o hpc/logs/sample_$J.out
-#BSUB -e hpc/logs/sample_$J.err
+#BSUB -o hpc/logs/sample_%J.out
+#BSUB -e hpc/logs/sample_%J.err
 
 # Submit your sampling run to a GPU queue:   bsub < hpc/sample.sh
 #
