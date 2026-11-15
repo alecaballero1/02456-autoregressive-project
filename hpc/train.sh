@@ -3,7 +3,7 @@
 #BSUB -J train
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 0:30
+#BSUB -W 3:00
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -o hpc/logs/train.out
 #BSUB -e hpc/logs/train.err
@@ -24,20 +24,19 @@ source hpc/env.sh   # uv on the PATH, caches off the home quota
 # uv run python train.py
 
 mkdir -p results
-: > results/gru_models.txt
+: > results/gru_models-trained.txt
 
-while read -r epochs layers size rate batch decay; do
+while read -r size layers rate epochs batch decay; do
     uv run python -m protgen.train_scripts.gru_train \
         --epochs "$epochs" --num-gru-layers "$layers" --gru-size "$size" \
         --learning-rate "$rate" --batch-size "$batch" --weight-decay "$decay"
 
     rate_label="${rate#0.}"
-    echo "gru_h${size}_l${layers}_r${rate_label}_e${epochs}_b${batch}_d${decay}" >> results/gru_models.txt
+    echo "gru_h${size}_l${layers}_r${rate_label}_e${epochs}_b${batch}_d${decay}" >> results/gru_models-trained.txt
 done <<'SETTINGS'
-60 1 50 0.001 64 0.0
-60 1 100 0.001 64 0.0
-60 1 200 0.001 64 0.0
-60 1 100 0.0003 64 0.0
-60 2 100 0.001 64 0.0
-60 1 100 0.001 64 0.0001
+300 4 0.001 70 64 0.0
+300 4 0.001 70 32 0.0
+200 4 0.001 70 64 0.0001
+300 4 0.001 70 64 0.0001
+300 3 0.001 70 64 0.0
 SETTINGS

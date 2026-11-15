@@ -3,7 +3,7 @@
 #BSUB -J eval
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 0:30
+#BSUB -W 3:00
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -o hpc/logs/eval.out
 #BSUB -e hpc/logs/eval.err
@@ -29,4 +29,4 @@ while read -r model; do
 done < results/gru_models.txt
 exit 0
 
-uv run --group eval python eval/eval.py --samples results/sequences/mock_data.csv --fold   
+# uv run --group eval python eval/eval.py --samples results/sequences/mock_data.csv --fold   

@@ -146,6 +146,7 @@ class TrainGru:
         model.load_state_dict(checkpoint["model_state"])
 
         print(
+            f"Trained model: {self.run_name}\n"
             f"Best epoch: {checkpoint['best_epoch']} "
             f"with validation loss: {checkpoint['val_loss']:.4f}"
         )
