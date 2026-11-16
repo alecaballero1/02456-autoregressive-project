@@ -20,7 +20,7 @@ sample_path = sample_path / CSV_FILENAME
 net = LSTMRNN(
     n_in=model_state["vocabulary_size"],
     n_hid=model_state["hidden_size"],
-    nb_layers=1,
+    nb_layers=model_state["num_layers"],
     bias=True,
     vocab_size=model_state["vocabulary_size"]
 ).to(device)
