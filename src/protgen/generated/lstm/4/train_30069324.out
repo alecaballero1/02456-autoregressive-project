@@ -1,0 +1,31 @@
+Epoch 0, validation loss improved: 3.1359. New model has been saved.
+Epoch 0, training loss: 2.115416783890623, validation loss: 3.1358819939624305, duration: 40.58s
+Epoch 1, validation loss improved: 1.8785. New model has been saved.
+Epoch 2, validation loss improved: 1.6713. New model has been saved.
+Epoch 3, validation loss improved: 1.5950. New model has been saved.
+Epoch 4, validation loss improved: 1.5604. New model has been saved.
+Epoch 5, validation loss improved: 1.5372. New model has been saved.
+Epoch 6, validation loss improved: 1.5338. New model has been saved.
+Epoch 8, validation loss improved: 1.5136. New model has been saved.
+Epoch 9, validation loss improved: 1.5041. New model has been saved.
+Epoch 10, training loss: 1.3840415907170294, validation loss: 1.507528776886581, duration: 40.32s
+Epoch 11, validation loss improved: 1.5004. New model has been saved.
+Epoch 12, validation loss improved: 1.4970. New model has been saved.
+Epoch 13, validation loss improved: 1.4956. New model has been saved.
+Epoch 14, validation loss improved: 1.4908. New model has been saved.
+Epoch 15, validation loss improved: 1.4839. New model has been saved.
+Epoch 18, validation loss improved: 1.4771. New model has been saved.
+Epoch 20, training loss: 1.335263239157929, validation loss: 1.4763197587288241, duration: 40.27s
+Epoch 25, validation loss improved: 1.4744. New model has been saved.
+Epoch 29, validation loss improved: 1.4715. New model has been saved.
+Epoch 30, training loss: 1.3198386492623893, validation loss: 1.7092022082318312, duration: 40.15s
+Epoch 31, validation loss improved: 1.4695. New model has been saved.
+Epoch 33, validation loss improved: 1.4680. New model has been saved.
+Epoch 34, validation loss improved: 1.4654. New model has been saved.
+Epoch 37, validation loss improved: 1.4637. New model has been saved.
+Epoch 39, validation loss improved: 1.4612. New model has been saved.
+Epoch 40, training loss: 1.307990072884326, validation loss: 1.4659131813621236, duration: 40.08s
+Epoch 41, validation loss improved: 1.4598. New model has been saved.
+Epoch 42, validation loss improved: 1.4534. New model has been saved.
+Epoch 50, training loss: 1.299651798227344, validation loss: 1.4655199122691023, duration: 40.10s
+Early stopping at epoch 53. The best validation loss was 1.4534

@@ -2,7 +2,6 @@
 
 import numpy as np
 import torch
-from .sequence_to_dicts import sequences_to_dicts
 
 def one_hot_encode(idx, vocab_size):
     """

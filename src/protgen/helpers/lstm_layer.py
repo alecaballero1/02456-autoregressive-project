@@ -1,5 +1,10 @@
 # This file contains code snippets from the "5.1 Recurrent Neural Networks".ipynb notebook provided in the course,
 # specifically code from section "Introduction to the Long Short-Term Memory (LSTM) Cell" in the notebook.
+
+# This LSTMLayer class was initially implemented for the LSTM model, but in the end we continued with the LSTM pytorch implementation (the model in lstm_pytorch.py). Course notes argued that this Nanograd implementation
+# of the LSTM model was computationally more epensive and took longer to train. Following these arguments, we decided to use the pytorch LSTM implementaiton. 
+# This LSTMLayer class is still included in the codebase, to highlight the work effort.
+
 from .normal_initializer import NormalInitializer
 from .var import Var
 from typing import Sequence

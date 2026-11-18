@@ -1,4 +1,5 @@
 # This method was taken from Notebook ‘5.1 Recurrent Neural Networks’, which was provided as part of the course materials for Week 5. 
+# This method is no longer used.
 
 from collections import defaultdict
 

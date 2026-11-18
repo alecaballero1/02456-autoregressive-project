@@ -27,7 +27,7 @@ cd /dtu/blackhole/0a/168650/02456-autoregressive-project
 echo "Working directory: $PWD"
 
 # SETS="control_real control_shuffled mock_data"
-SETS="2"
+SETS="4"
 
 for NAME in $SETS; do
     SAMPLES="results/sequences/$NAME/lstm_samples.csv"
@@ -38,7 +38,7 @@ for NAME in $SETS; do
         continue
     fi
     echo "== $NAME"
-    bash hpc/run_eval.sh "$SAMPLES" "results/eval/2"
+    bash hpc/run_eval.sh "$SAMPLES" "results/eval/$NAME"
 done
 
 echo "Done."
