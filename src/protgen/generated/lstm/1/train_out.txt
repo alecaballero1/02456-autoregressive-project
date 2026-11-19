@@ -1,0 +1,43 @@
+Epoch 0, training loss: 2.3145769436930896, validation loss: 3.1439283981971418, duration: 29.30s
+Epoch 10, training loss: 1.5561391099282864, validation loss: 1.660620357321835, duration: 30.90s
+Epoch 20, training loss: 1.6625508103161566, validation loss: 2.291619208620406, duration: 30.95s
+Epoch 30, training loss: 1.6662089041333072, validation loss: 1.743532399336497, duration: 29.50s
+Epoch 40, training loss: 1.646138909836759, validation loss: 1.7133682152737624, duration: 30.36s
+Epoch 50, training loss: 2.5495096348830675, validation loss: 2.750899749181081, duration: 30.51s
+Epoch 60, training loss: 1.5667919876172525, validation loss: 1.6771084564081256, duration: 30.56s
+Epoch 70, training loss: 1.5393921771885528, validation loss: 1.6546239669414713, duration: 30.58s
+Epoch 80, training loss: 2.002108885639913, validation loss: 2.0773215414821236, duration: 30.51s
+Epoch 90, training loss: 1.7579997166488948, validation loss: 1.7779030957143347, duration: 29.60s
+Epoch 100, training loss: 1.6364001212123032, validation loss: 1.7402066671210845, duration: 28.95s
+Epoch 110, training loss: 2.8296458286590194, validation loss: 3.194443200362557, duration: 29.56s
+Epoch 120, training loss: 1.647940679791194, validation loss: 1.7606703110899347, duration: 30.11s
+Epoch 130, training loss: 1.5829011299702038, validation loss: 1.7045734743366594, duration: 30.10s
+Epoch 140, training loss: 1.617353983628988, validation loss: 1.9349323077418696, duration: 30.21s
+Epoch 150, training loss: 1.5411336525707284, validation loss: 1.6778102294318025, duration: 30.00s
+Epoch 160, training loss: 1.564108915518174, validation loss: 1.7906734198406302, duration: 30.07s
+Epoch 170, training loss: 1.6865673772953498, validation loss: 1.6595185907526888, duration: 29.99s
+Epoch 180, training loss: 2.7625706708833073, validation loss: 2.7400505008964404, duration: 30.33s
+Epoch 190, training loss: 2.7368512934959783, validation loss: 2.703053412825867, duration: 30.55s
+
+Input sequence:
+tensor([ 1, 13, 19, 11,  3,  6, 20, 10, 20,  3, 10,  3,  5, 11, 19,  8, 20,  5,
+        11,  3, 18, 20, 18, 19, 19, 12,  6, 18,  7,  7,  6, 10, 20, 11,  5, 19,
+        12,  3, 16,  8,  5,  3, 20, 22, 20, 17,  8,  7,  8, 18,  7, 20, 14, 11,
+         9, 17,  3,  3, 11, 11,  3, 17, 14, 10, 18,  3, 11, 19, 19, 20, 13, 20,
+        15,  3,  9, 18, 20, 15,  8,  7, 11, 15,  3, 11,  6,  7, 19,  6, 16, 20,
+        11,  3, 18, 20, 11,  2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+         0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+         0,  0,  0])
+
+Target sequence:
+tensor([13, 19, 11,  3,  6, 20, 10, 20,  3, 10,  3,  5, 11, 19,  8, 20,  5, 11,
+         3, 18, 20, 18, 19, 19, 12,  6, 18,  7,  7,  6, 10, 20, 11,  5, 19, 12,
+         3, 16,  8,  5,  3, 20, 22, 20, 17,  8,  7,  8, 18,  7, 20, 14, 11,  9,
+        17,  3,  3, 11, 11,  3, 17, 14, 10, 18,  3, 11, 19, 19, 20, 13, 20, 15,
+         3,  9, 18, 20, 15,  8,  7, 11, 15,  3, 11,  6,  7, 19,  6, 16, 20, 11,
+         3, 18, 20, 11,  2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1])
+
+Predicted sequence:
+['M', 'T', 'K', 'S', 'E', 'L', 'I', 'E', 'K', 'G', 'A', 'A', 'A', 'A', 'G', 'L', 'T', 'K', 'A', 'D', 'A', 'D', 'A', 'V', 'V', 'E', 'A', 'I', 'F', 'E', 'A', 'I', 'A', 'E', 'A', 'L', 'A', 'K', 'G', 'D', 'R', 'V', 'E', 'I', 'R', 'G', 'F', 'G', 'T', 'F', 'S', 'V', 'R', 'K', 'R', 'A', 'A', 'R', 'T', 'G', 'R', 'N', 'P', 'K', 'K', 'R', 'E', 'T', 'I', 'P', 'I', 'P', 'A', 'S', 'K', 'V', 'P', 'V', 'F', 'K', 'P', 'G', 'K', 'V', 'F', 'K', 'E', 'A', 'V', 'N', 'K', '<EOS>', '<EOS>', '<EOS>', 'K', '<EOS>', 'I', 'E', 'I', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', '<EOS>', 'I', 'I', 'I', 'I', 'I', 'I', 'L', 'L', 'L', 'L', 'L', 'L', 'L']
