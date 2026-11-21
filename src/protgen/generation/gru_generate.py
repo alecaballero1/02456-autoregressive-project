@@ -1,3 +1,7 @@
+"""
+Class to sample protein sequences from a saved GRU model
+"""
+
 import csv
 from pathlib import Path
 
@@ -17,11 +21,13 @@ class GenerateGru:
         self.output_path = SEQUENCE_DIR / f"{self.pt_file_path.stem}.csv"
     
     def generate(self):
-        num_sequences = 256
-        max_length = 127
+        """Sample sequences until EOS or the length limit and save them to CSV"""
+        num_sequences = 256 # number of protiens to generate
+        max_length = 127 # max length of proteins (just taken as the max lenght in the given data)
 
         torch.manual_seed(SEED)
 
+        # load the checkpoint to generate from (.pt file)
         checkpoint = torch.load(
             self.pt_file_path,
             map_location="cpu",
@@ -34,6 +40,7 @@ class GenerateGru:
             for token, token_id in vocab.items()
         }
 
+        # instantiate model from checkpoint & set to eval mode
         model = Gru(
             vocab_size=len(vocab),
             hidden_size=checkpoint["hidden_size"],
@@ -45,6 +52,7 @@ class GenerateGru:
         rows = []
 
         with torch.no_grad():
+            # Generate proteins until we have an amount matching num_sequences
             for index in range(num_sequences):
                 token = torch.tensor([[vocab["<BOS>"]]])
                 hidden = None
@@ -52,12 +60,15 @@ class GenerateGru:
                 ended_with_eos = False
 
                 for position in range(max_length + 1):
+                    # Carry the hidden state forward to retain sequence context
                     logits, hidden = model(token, hidden)
                     scores = logits[0, -1] / TEMPERATURE
 
+                    # Prevent padding and start tokens from appearing in sequences
                     scores[vocab["<PAD>"]] = -torch.inf
                     scores[vocab["<BOS>"]] = -torch.inf
 
+                    # Get the higest probability token
                     probabilities = torch.softmax(scores, dim=-1)
                     token = torch.multinomial(
                         probabilities, num_samples=1
@@ -69,6 +80,7 @@ class GenerateGru:
                         ended_with_eos = True
                         break
 
+                    # Allow EOS after the final residue without exceeding the length limit.
                     if position == max_length:
                         break
 
@@ -80,6 +92,7 @@ class GenerateGru:
                     ended_with_eos,
                 ])
 
+        # save the sampled proteins
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 
         with self.output_path.open("w", newline="", encoding="utf-8") as handle:

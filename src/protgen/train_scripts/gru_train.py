@@ -1,3 +1,7 @@
+"""
+Train the GRU and save the checkpoint with the lowest validation loss
+"""
+
 import argparse
 import csv
 
@@ -18,11 +22,12 @@ from protgen.helpers.gru_constants import (
 )
 from protgen.data import IGNORE_INDEX, ProteinDataset
 from protgen.models.gru import Gru
-from protgen.helpers.gru_epochs import train_epoch, evaluate
+from protgen.helpers.gru_evaluate import EvaluateGru
 
 
 class TrainGru:
     def __init__(self, **args):
+        """Apply training overrides and derive the run's output paths."""
         self.seed = SEED
         self.epochs = args.get("epochs", EPOCHS)
         self.num_gru_layers = args.get("num_gru_layers", NUM_GRU_LAYERS)
@@ -40,14 +45,56 @@ class TrainGru:
         self.checkpoint_path = CHECKPOINT_DIR / f"{self.run_name}.pt"
         self.history_path = CHECKPOINT_DIR / f"{self.run_name}_history.csv"
 
+    def train_epoch(self, model, loader, loss_function, optimizer, device):
+        """Train for one epoch and return the mean token loss"""
+        # put model in training mode 
+        model.train()
+        total_loss = 0.0
+        total_tokens = 0
+
+        for tokens, targets, _, _ in loader:
+            tokens = tokens.to(device)
+            targets = targets.to(device)
+
+            optimizer.zero_grad()
+
+            logits, _ = model(tokens)
+
+            # Flatten batch and sequence dimensions
+            loss_sum = loss_function(
+                logits.reshape(-1, model.vocab_size),
+                targets.reshape(-1),
+            )
+
+            # Exclude padding when normalizing the loss
+            token_count = (targets != IGNORE_INDEX).sum()
+            loss = loss_sum / token_count
+
+            # backpropagation
+            loss.backward()
+
+            # Limit exploding gradients during recurrent training
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=GRADIENT_CLIP_NORM)
+
+            # update weights 
+            optimizer.step()
+
+            total_loss += loss_sum.item()
+            total_tokens += token_count.item()
+
+        return total_loss / total_tokens
+
     def train(self):
+        """Train and validate the GRU, then return the best saved model."""
 
         torch.manual_seed(self.seed)
 
+        # Use GPU if available
         device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
 
+        # Load data
         train_data = ProteinDataset("data/train.csv")
         val_data = ProteinDataset("data/val.csv")
 
@@ -63,23 +110,30 @@ class TrainGru:
             shuffle=False,
         )
 
+        # Instantiate model
         model = Gru(
             vocab_size=train_data.vocab_size,
             hidden_size=self.gru_size,
             num_layers=self.num_gru_layers,
         ).to(device)
 
+        # A quick scan of a few research paper abstracts suggested RSMprop performed well as GRU optmizer
         optimizer = optim.RMSprop(
             model.parameters(),
             lr=self.learning_rate,
             weight_decay=self.weight_decay,
         )
 
+        # We use crossentropyloss as loss function
         loss_function = nn.CrossEntropyLoss(
             ignore_index=IGNORE_INDEX,
             reduction="sum",
         )
+        
+        # instantiate evaluator class used to evaluate gru
+        evaluator = EvaluateGru(model, loss_function, device)
 
+        # create and open files to save training output
         CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
         best_val_loss = float("inf")
@@ -92,8 +146,10 @@ class TrainGru:
             writer = csv.writer(handle)
             writer.writerow(["epoch", "train_loss", "val_loss"])
 
+            # Iterate over epchs
             for epoch in range(1, self.epochs + 1):
-                train_loss = train_epoch(
+                # train epoch on training data
+                train_loss = self.train_epoch(
                     model,
                     train_loader,
                     loss_function,
@@ -101,13 +157,10 @@ class TrainGru:
                     device,
                 )
 
-                val_loss = evaluate(
-                    model,
-                    val_loader,
-                    loss_function,
-                    device,
-                )
+                # calculate loss on validation data 
+                val_loss = evaluator.evaluate(val_loader)
 
+                # write row in history
                 writer.writerow([epoch, train_loss, val_loss])
                 handle.flush()
 
@@ -117,6 +170,7 @@ class TrainGru:
                     flush=True,
                 )
 
+                # save model if this epoch has performed better than the previous best, based on validation loss
                 if val_loss < best_val_loss:
                     best_val_loss = val_loss
 
@@ -137,6 +191,7 @@ class TrainGru:
                         "seed": self.seed,
                     }, self.checkpoint_path)
 
+        # load best checkpoint and print training results
         checkpoint = torch.load(
             self.checkpoint_path,
             map_location=device,
@@ -155,6 +210,7 @@ class TrainGru:
 
 
 if __name__ == "__main__":
+    # add arguments for easier override of parameter contants (made it easier to train different models to compare)
     parser = argparse.ArgumentParser(description="Train a GRU protein sequence model.")
     parser.add_argument("--epochs", type=int, default=argparse.SUPPRESS)
     parser.add_argument("--num-gru-layers", type=int, default=argparse.SUPPRESS)

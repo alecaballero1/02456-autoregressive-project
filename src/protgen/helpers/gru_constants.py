@@ -1,6 +1,8 @@
 """
-Constants file for gru. Inline comments are the key for the parameter that is used in naming. 
+GRU defaults
+Inline letters identify parameters in run names.
 """
+
 from pathlib import Path
 
 CHECKPOINT_DIR = Path("results/checkpoints/gru")
