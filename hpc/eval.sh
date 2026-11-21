@@ -3,7 +3,7 @@
 #BSUB -J eval
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 2:00
+#BSUB -W 3:00
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -o hpc/logs/eval.out
 #BSUB -e hpc/logs/eval.err
@@ -16,23 +16,17 @@
 # sampled. Each set lands in results/eval/<name>/.
 #
 # Uncomment the #BSUB -u/-B/-N lines to be emailed when the job starts and ends.
-##BSUB -u <EMAIL_ADDRESS>
-##BSUB -B
-##BSUB -N
+# BSUB -u s253065@dtu.dk
+# BSUB -B
+# BSUB -N
 
-set -eu
-cd "$(dirname "$0")/.."
+set -e
+source hpc/env.sh
 
-SETS="control_real control_shuffled mock_data"
+while read -r model; do
+    echo "$model" | uv run python -m protgen.generation.gru_generate || exit $?
+    uv run --group eval python eval/eval.py --samples "results/sequences/gru/$model.csv" --fold
+done < results/gru_models.txt
+exit 0
 
-for NAME in $SETS; do
-    SAMPLES="results/sequences/$NAME.csv"
-    if [ ! -f "$SAMPLES" ]; then
-        echo "== $NAME: no $SAMPLES, skipping"
-        continue
-    fi
-    echo "== $NAME"
-    bash hpc/run_eval.sh "$SAMPLES"
-done
-
-echo "Done. Each set is in results/eval/<name>/"
+# uv run --group eval python eval/eval.py --samples results/sequences/mock_data.csv --fold   
